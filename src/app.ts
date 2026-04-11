@@ -6,7 +6,7 @@ const app = express();
 app.use(json());
 app.use(
   cors({
-    origin: ["https://cascateer.dev", "http://localhost"],
+    origin: "*",
   }),
 );
 
