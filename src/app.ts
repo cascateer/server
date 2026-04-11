@@ -1,8 +1,15 @@
-import express from "express";
+import cors from "cors";
+import express, { json } from "express";
 
 const app = express();
 
-app.use(express.json());
+app.use(json());
+app.use(
+  cors({
+    origin: "https://cascateer.dev/",
+  }),
+);
+
 app.use("/rubiks/baseMoves", (req, res, next) =>
   res.json({
     Z: [
@@ -75,6 +82,7 @@ app.use("/rubiks/baseMoves", (req, res, next) =>
     ],
   }),
 );
+
 app.use("/rubiks/customMoves", (req, res, next) =>
   res.json([
     {
