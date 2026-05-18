@@ -6,18 +6,9 @@ import url from "url";
 
 const app = express();
 
-const oauth2ClientSecret = {
-  client_id:
-    "533820391852-5dg7mkr9f6eo359ohrjti3b9np2ajiuf.apps.googleusercontent.com",
-  project_id: "youtube-data-api-496716",
-  auth_uri: "https://accounts.google.com/o/oauth2/auth",
-  token_uri: "https://oauth2.googleapis.com/token",
-  auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-  client_secret: "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",
-};
 const oauth2Client = new google.auth.OAuth2(
-  oauth2ClientSecret.client_id,
-  oauth2ClientSecret.client_secret,
+  process.env.YOUTUBE_CLIENT_ID,
+  process.env.YOUTUBE_CLIENT_SECRET,
   "https://server-jp2n.onrender.com/youtube/auth-callback",
 );
 
