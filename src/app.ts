@@ -23,9 +23,9 @@ app.use(
 );
 app.use(
   session({
-    secret: "keyboard cat",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    secret: "secret secret",
   }),
 );
 
@@ -128,8 +128,8 @@ app.use("/youtube/auth", (req, res) =>
 );
 
 app.use("/youtube/auth-callback", async (req, res) => {
-  if (typeof req.query.code === "string") {
-    return oauth2Client.getToken(req.query.code).then(({ tokens }) => {
+  if (req.query.state === req.session.state) {
+    return oauth2Client.getToken(String(req.query.code)).then(({ tokens }) => {
       oauth2Client.setCredentials(tokens);
       res.send(tokens);
     });
