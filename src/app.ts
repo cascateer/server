@@ -130,10 +130,7 @@ app.use("/youtube/auth", (req, res) =>
 app.use("/youtube/auth-callback", async (req, res) => {
   req.query.state;
 
-  if (
-    req.query.state === req.session.state &&
-    typeof req.query.code === "string"
-  ) {
+  if (typeof req.query.code === "string") {
     return oauth2Client.getToken(req.query.code).then(({ tokens }) => {
       oauth2Client.setCredentials(tokens);
       res.send(tokens);
