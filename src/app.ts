@@ -1,6 +1,7 @@
 import cors from "cors";
 import { randomBytes } from "crypto";
 import express, { json } from "express";
+import session from "express-session";
 import { google } from "googleapis";
 import url from "url";
 
@@ -16,6 +17,13 @@ app.use(json());
 app.use(
   cors({
     origin: "*",
+  }),
+);
+app.use(
+  session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
   }),
 );
 
