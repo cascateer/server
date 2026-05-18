@@ -1,13 +1,25 @@
+import { RedisStore } from "connect-redis";
 import cors from "cors";
 import { randomBytes } from "crypto";
 import { configDotenv } from "dotenv";
 import express, { json } from "express";
 import session from "express-session";
 import { google } from "googleapis";
+import { createClient } from "redis";
 
 configDotenv();
 
 const app = express();
+
+const redisClient = createClient({
+  url: "redis://red-d85n7errjlhs73a4h46g:6379",
+});
+redisClient.connect().catch(console.error);
+
+// Initialize store.
+const redisStore = new RedisStore({
+  client: redisClient,
+});
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.YOUTUBE_CLIENT_ID,
@@ -19,7 +31,6 @@ app.use(json());
 app.use(
   cors({
     origin: "*",
-    credentials: true,
   }),
 );
 app.use(
@@ -27,14 +38,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     secret: "secret secret",
-    cookie: {
-      sameSite: "none",
-      secure: true,
-    },
+    store: redisStore,
   }),
 );
-
-app.set("trust proxy", 1);
 
 app.use("/rubiks/baseMoves", (req, res, next) =>
   res.json({
