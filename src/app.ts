@@ -4,6 +4,7 @@ import { configDotenv } from "dotenv";
 import express, { json } from "express";
 import session from "express-session";
 import { google } from "googleapis";
+import MemoryStore from "memorystore";
 
 configDotenv();
 
@@ -26,6 +27,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     secret: "secret secret",
+    store: new (MemoryStore(session))({
+      checkPeriod: 86400000,
+    }),
   }),
 );
 
@@ -128,10 +132,12 @@ app.use("/youtube/auth", (req, res) =>
 );
 
 app.use("/youtube/auth-callback", async (req, res) =>
-  oauth2Client.getToken(`${req.query.code}`).then(({ tokens }) => {
-    oauth2Client.setCredentials(tokens);
-    res.send(tokens);
-  }),
+  req.query.state === req.session.state
+    ? oauth2Client.getToken(`${req.query.code}`).then(({ tokens }) => {
+        oauth2Client.setCredentials(tokens);
+        res.send(tokens);
+      })
+    : res.sendStatus(401),
 );
 
 app.use("/youtube/test", async (req, res) =>
