@@ -118,7 +118,7 @@ app.use("/rubiks/customMoves", (req, res, next) =>
 );
 
 app.use("/youtube/auth", (req, res) =>
-  res.redirect(
+  res.send(
     oauth2Client.generateAuthUrl({
       access_type: "offline",
       scope: ["https://www.googleapis.com/auth/youtube.force-ssl"],
