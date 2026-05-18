@@ -26,11 +26,6 @@ app.use(
     resave: false,
     saveUninitialized: false,
     secret: "secret secret",
-    cookie: {
-      secure: true,
-      httpOnly: false,
-      sameSite: "none",
-    },
   }),
 );
 
@@ -132,15 +127,15 @@ app.use("/youtube/auth", (req, res) =>
   ),
 );
 
-app.use("/youtube/auth-callback", async (req, res) => {
-  if (req.query.state === req.session.state) {
-    return oauth2Client.getToken(String(req.query.code)).then(({ tokens }) => {
-      oauth2Client.setCredentials(tokens);
-      res.send(tokens);
-    });
-  } else {
-    res.sendStatus(401);
-  }
-});
+app.use("/youtube/auth-callback", async (req, res) =>
+  oauth2Client.getToken(`${req.query.code}`).then(({ tokens }) => {
+    oauth2Client.setCredentials(tokens);
+    res.send(tokens);
+  }),
+);
+
+app.use("/youtube/test", async (req, res) =>
+  res.send(oauth2Client.credentials),
+);
 
 export default app;
