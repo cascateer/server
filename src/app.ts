@@ -30,6 +30,10 @@ app.use(
     store: new (MemoryStore(session))({
       checkPeriod: 86400000,
     }),
+    cookie: {
+      sameSite: "none",
+      secure: true,
+    },
   }),
 );
 
