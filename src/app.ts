@@ -4,7 +4,6 @@ import { configDotenv } from "dotenv";
 import express, { json } from "express";
 import session from "express-session";
 import { google } from "googleapis";
-import url from "url";
 
 configDotenv();
 
@@ -129,14 +128,13 @@ app.use("/youtube/auth", (req, res) =>
 );
 
 app.use("/youtube/auth-callback", async (req, res) => {
-  const query = url.parse(req.url, true).query;
+  req.query.state;
 
   if (
-    query.error == null &&
-    query.state === req.session.state &&
-    typeof query.code === "string"
+    req.query.state === req.session.state &&
+    typeof req.query.code === "string"
   ) {
-    return oauth2Client.getToken(query.code).then(({ tokens }) => {
+    return oauth2Client.getToken(req.query.code).then(({ tokens }) => {
       oauth2Client.setCredentials(tokens);
       res.send(tokens);
     });
