@@ -12,8 +12,7 @@
     "dotenv": "^17.4.1",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
-    "googleapis": "^171.4.0",
-    "memorystore": "^1.6.8"
+    "googleapis": "^171.4.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

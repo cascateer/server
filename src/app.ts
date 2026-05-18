@@ -4,7 +4,6 @@ import { configDotenv } from "dotenv";
 import express, { json } from "express";
 import session from "express-session";
 import { google } from "googleapis";
-import MemoryStore from "memorystore";
 
 configDotenv();
 
@@ -20,6 +19,7 @@ app.use(json());
 app.use(
   cors({
     origin: "*",
+    credentials: true,
   }),
 );
 app.use(
@@ -27,15 +27,14 @@ app.use(
     resave: false,
     saveUninitialized: false,
     secret: "secret secret",
-    store: new (MemoryStore(session))({
-      checkPeriod: 86400000,
-    }),
     cookie: {
       sameSite: "none",
       secure: true,
     },
   }),
 );
+
+app.set("trust proxy", 1);
 
 app.use("/rubiks/baseMoves", (req, res, next) =>
   res.json({
