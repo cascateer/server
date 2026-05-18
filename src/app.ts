@@ -133,6 +133,8 @@ app.use("/youtube/auth-callback", async (req, res) => {
       oauth2Client.setCredentials(tokens);
       res.send(tokens);
     });
+  } else {
+    res.sendStatus(401);
   }
 });
 
