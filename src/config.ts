@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
+import { configDotenv } from "dotenv";
 
-dotenv.config();
+configDotenv();
 
 export default {
   host: process.env.HOST ?? "localhost",

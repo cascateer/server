@@ -1,9 +1,12 @@
 import cors from "cors";
 import { randomBytes } from "crypto";
+import { configDotenv } from "dotenv";
 import express, { json } from "express";
 import session from "express-session";
 import { google } from "googleapis";
 import url from "url";
+
+configDotenv();
 
 const app = express();
 
