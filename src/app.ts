@@ -1,7 +1,25 @@
 import cors from "cors";
+import { randomBytes } from "crypto";
 import express, { json } from "express";
+import { google } from "googleapis";
+import url from "url";
 
 const app = express();
+
+const oauth2ClientSecret = {
+  client_id:
+    "533820391852-5dg7mkr9f6eo359ohrjti3b9np2ajiuf.apps.googleusercontent.com",
+  project_id: "youtube-data-api-496716",
+  auth_uri: "https://accounts.google.com/o/oauth2/auth",
+  token_uri: "https://oauth2.googleapis.com/token",
+  auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+  client_secret: "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",
+};
+const oauth2Client = new google.auth.OAuth2(
+  oauth2ClientSecret.client_id,
+  oauth2ClientSecret.client_secret,
+  "https://server-jp2n.onrender.com/youtube/auth-callback",
+);
 
 app.use(json());
 app.use(
@@ -96,5 +114,31 @@ app.use("/rubiks/customMoves", (req, res, next) =>
     },
   ]),
 );
+
+app.use("/youtube/auth", (req, res) =>
+  res.redirect(
+    oauth2Client.generateAuthUrl({
+      access_type: "offline",
+      scope: ["https://www.googleapis.com/auth/youtube.force-ssl"],
+      include_granted_scopes: true,
+      state: (req.session.state = randomBytes(32).toString("hex")),
+    }),
+  ),
+);
+
+app.use("/youtube/auth-callback", async (req, res) => {
+  const query = url.parse(req.url, true).query;
+
+  if (
+    query.error == null &&
+    query.state === req.session.state &&
+    typeof query.code === "string"
+  ) {
+    return oauth2Client.getToken(query.code).then(({ tokens }) => {
+      oauth2Client.setCredentials(tokens);
+      res.send(tokens);
+    });
+  }
+});
 
 export default app;
