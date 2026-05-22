@@ -38,7 +38,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     secret: "secret secret",
-    store: redisStore
+    store: redisStore,
   }),
 );
 
@@ -129,30 +129,24 @@ app.use("/rubiks/customMoves", (req, res, next) =>
   ]),
 );
 
-app.use(
-  "/youtube/auth",
-  (req, res) => (
-    res.send(
-      oauth2Client.generateAuthUrl({
-        access_type: "offline",
-        scope: ["https://www.googleapis.com/auth/youtube.force-ssl"],
-        include_granted_scopes: true,
-        state: (req.session.state = randomBytes(32).toString("hex")),
-      }),
-    ),
+app.use("/youtube/auth", (req, res) =>
+  res.send(
+    oauth2Client.generateAuthUrl({
+      access_type: "offline",
+      scope: ["https://www.googleapis.com/auth/youtube.force-ssl"],
+      include_granted_scopes: true,
+      state: (req.session.state = randomBytes(32).toString("hex")),
+    }),
   ),
 );
 
-app.use(
-  "/youtube/auth-callback",
-  async (req, res) => (
-    req.query.state === req.session.state
-      ? oauth2Client.getToken(`${req.query.code}`).then(({ tokens }) => {
-          oauth2Client.setCredentials(tokens);
-          res.send(tokens);
-        })
-      : res.sendStatus(401)
-  ),
+app.use("/youtube/auth-callback", async (req, res) =>
+  req.query.state === req.session.state
+    ? oauth2Client.getToken(`${req.query.code}`).then(({ tokens }) => {
+        oauth2Client.setCredentials(tokens);
+        res.send(tokens);
+      })
+    : res.sendStatus(401),
 );
 
 app.use("/youtube/test", async (req, res) =>
