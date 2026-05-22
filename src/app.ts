@@ -12,7 +12,7 @@ configDotenv();
 const app = express();
 
 const redisClient = createClient({
-  url: "rediss://red-d88bffr7uimc73bb0ce0:Nfiurb6m3DqIcFNjWqMTxfDeTJeNYBZ3@ohio-keyvalue.render.com:6379",
+  url: "redis://red-d88bffr7uimc73bb0ce0:6379",
 });
 redisClient.connect().catch(console.error);
 
