@@ -36,7 +36,7 @@ app.use(
 app.use(
   session({
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     secret: "secret secret",
     store: redisStore,
   }),
