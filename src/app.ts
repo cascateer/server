@@ -1,5 +1,6 @@
 import { RedisStore } from "connect-redis";
 import cors from "cors";
+import { randomBytes } from "crypto";
 import express, { json } from "express";
 import session from "express-session";
 import { google } from "googleapis";
@@ -35,8 +36,8 @@ app.use(
 );
 app.use(
   session({
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     secret: "secret secret",
     store: redisStore,
   }),
@@ -135,7 +136,7 @@ app.use("/youtube/auth", (req, res) =>
       access_type: "offline",
       scope: ["https://www.googleapis.com/auth/youtube.force-ssl"],
       include_granted_scopes: true,
-      state: (req.session.state = "foo"),
+      state: (req.session.state = randomBytes(32).toString("hex")),
     }),
   ),
 );
