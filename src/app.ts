@@ -30,7 +30,7 @@ const oauth2Client = new google.auth.OAuth2(
 app.use(json());
 app.use(
   cors({
-    origin: ["https://cascateer.dev", "http://localhost:5173"],
+    origin: true,
     credentials: true,
   }),
 );
