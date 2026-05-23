@@ -1,8 +1,6 @@
 import { configDotenv } from "dotenv";
 
-configDotenv();
-
-export default {
-  host: process.env.HOST ?? "localhost",
-  port: Number(process.env.PORT ?? 3000),
-};
+export const config = () =>
+  configDotenv({
+    path: [".env.local", ".env"],
+  });

@@ -1,6 +1,8 @@
 import app from "./app";
-import config from "./config";
+import { config } from "./config";
 
-app.listen(config.port, config.host, () =>
-  console.info(`Server is running on ${config.host}:${config.port}`),
+config();
+
+app.listen(+process.env.PORT!, process.env.HOST!, () =>
+  console.info(`Server is running on ${process.env.HOST}:${process.env.PORT}`),
 );

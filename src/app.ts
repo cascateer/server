@@ -1,19 +1,20 @@
 import { RedisStore } from "connect-redis";
 import cors from "cors";
 import { randomBytes } from "crypto";
-import { configDotenv } from "dotenv";
 import express, { json } from "express";
 import session from "express-session";
 import { google } from "googleapis";
 import { createClient } from "redis";
+import { config } from "./config";
 
-configDotenv();
+config();
 
 const app = express();
 
 const redisClient = createClient({
-  url: "redis://red-d88bffr7uimc73bb0ce0:6379",
+  url: process.env.REDIS_CLIENT_URL,
 });
+
 redisClient.connect().catch(console.error);
 
 const redisStore = new RedisStore({
@@ -23,13 +24,13 @@ const redisStore = new RedisStore({
 const oauth2Client = new google.auth.OAuth2(
   process.env.YOUTUBE_CLIENT_ID,
   process.env.YOUTUBE_CLIENT_SECRET,
-  "https://server-jp2n.onrender.com/youtube/auth-callback",
+  process.env.YOUTUBE_REDIRECT_URI,
 );
 
 app.use(json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://cascateer.dev/"],
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
   }),
 );
