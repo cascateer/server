@@ -30,7 +30,7 @@ const oauth2Client = new google.auth.OAuth2(
 app.use(json());
 app.use(
   cors({
-    origin: true,
+    origin: ["http://localhost:5173/"],
     credentials: true,
   }),
 );
