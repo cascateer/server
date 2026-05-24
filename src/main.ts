@@ -1,8 +1,18 @@
+import { readFileSync } from "fs";
+import { createServer } from "https";
 import app from "./app";
 import { config } from "./config";
 
 config();
 
-app.listen(+process.env.PORT!, process.env.HOST!, () =>
-  console.info(`Server is running on ${process.env.HOST}:${process.env.PORT}`),
+createServer(
+  {
+    pfx: readFileSync("./ssl.pfx"),
+    passphrase: "passphrase",
+  },
+  app,
+).listen(+process.env.PORT!, process.env.HOST!, () =>
+  console.info(
+    `Server is running on https://${process.env.HOST}:${process.env.PORT}`,
+  ),
 );
