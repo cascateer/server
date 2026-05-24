@@ -170,7 +170,7 @@ app.get("/spotify/auth", (req, res) =>
 );
 
 app.get("/spotify/auth-callback", async (req, res) =>
-  res.send(
+  res.json(
     await axios.post("https://accounts.spotify.com/api/token", {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
