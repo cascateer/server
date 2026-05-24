@@ -15,6 +15,8 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.YOUTUBE_REDIRECT_URI,
 );
 
+const generateRandomString = () => randomBytes(32).toString("hex");
+
 app.use(json());
 app.use(
   cors({
@@ -30,7 +32,7 @@ app.use(
   }),
 );
 
-app.use("/rubiks/baseMoves", (req, res, next) =>
+app.get("/rubiks/baseMoves", (req, res, next) =>
   res.json({
     Z: [
       { key: "B", action: [{ slice: "B" }] },
@@ -103,7 +105,7 @@ app.use("/rubiks/baseMoves", (req, res, next) =>
   }),
 );
 
-app.use("/rubiks/customMoves", (req, res, next) =>
+app.get("/rubiks/customMoves", (req, res, next) =>
   res.json([
     {
       key: "Sexy Move",
@@ -117,18 +119,18 @@ app.use("/rubiks/customMoves", (req, res, next) =>
   ]),
 );
 
-app.use("/youtube/auth", (req, res) =>
+app.get("/youtube/auth", (req, res) =>
   res.send(
     oauth2Client.generateAuthUrl({
       access_type: "offline",
       scope: ["https://www.googleapis.com/auth/youtube.force-ssl"],
       include_granted_scopes: true,
-      state: (req.session.state = randomBytes(32).toString("hex")),
+      state: (req.session.state = generateRandomString()),
     }),
   ),
 );
 
-app.use("/youtube/auth-callback", async (req, res) =>
+app.get("/youtube/auth-callback", async (req, res) =>
   req.query.state === req.session.state
     ? oauth2Client.getToken(`${req.query.code}`).then(({ tokens }) => {
         oauth2Client.setCredentials(tokens);
@@ -137,8 +139,20 @@ app.use("/youtube/auth-callback", async (req, res) =>
     : res.sendStatus(401),
 );
 
-app.use("/youtube/test", async (req, res) =>
+app.get("/youtube/test", async (req, res) =>
   res.send(oauth2Client.credentials),
+);
+
+app.get("/spotify/auth", (req, res) =>
+  res.send(
+    `https://accounts.spotify.com/authorize?${new URLSearchParams({
+      response_type: "code",
+      client_id: process.env.SPOTIFY_CLIENT_ID!,
+      scope: "user-read-private user-read-email",
+      redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
+      state: generateRandomString(),
+    })}`,
+  ),
 );
 
 export default app;
