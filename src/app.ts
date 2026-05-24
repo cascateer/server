@@ -31,6 +31,7 @@ app.use(json());
 app.use(
   cors({
     credentials: true,
+    origin: true,
   }),
 );
 app.use(
