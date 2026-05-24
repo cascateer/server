@@ -1,3 +1,4 @@
+import axios from "axios";
 import { RedisStore } from "connect-redis";
 import cors from "cors";
 import { randomBytes } from "crypto";
@@ -165,6 +166,22 @@ app.get("/spotify/auth", (req, res) =>
       redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
       state: generateRandomString(),
     })}`,
+  ),
+);
+
+app.get("/spotify/auth-callback", async (req, res) =>
+  res.send(
+    await axios.post("https://accounts.spotify.com/api/token", {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: {
+        client_id: process.env.SPOTIFY_CLIENT_ID,
+        grant_type: "authorization_code",
+        code: req.query.code,
+        redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
+      },
+    }),
   ),
 );
 
