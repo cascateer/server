@@ -172,17 +172,20 @@ app.get("/spotify/auth", (req, res) =>
 app.get("/spotify/auth-callback", async (req, res) =>
   res.json(
     await axios
-      .post("https://accounts.spotify.com/api/token", {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
+      .post(
+        "https://accounts.spotify.com/api/token",
+        new URLSearchParams({
           client_id: process.env.SPOTIFY_CLIENT_ID!,
           grant_type: "authorization_code",
           code: String(req.query.code),
           redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
         }),
-      })
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        },
+      )
       .then(({ data }) => data),
   ),
 );
