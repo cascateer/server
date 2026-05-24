@@ -39,7 +39,6 @@ app.use(
     resave: false,
     saveUninitialized: false,
     secret: "secret secret",
-    store: redisStore,
   }),
 );
 
