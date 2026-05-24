@@ -179,7 +179,12 @@ app.get("/spotify/auth-callback", async (req, res) =>
           grant_type: "authorization_code",
           code: String(req.query.code),
           redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
-        }),
+        }).toString(),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        },
       )
       .then(({ data }) => data),
   ),
