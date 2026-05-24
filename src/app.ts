@@ -1,13 +1,25 @@
+import { RedisStore } from "connect-redis";
 import cors from "cors";
 import { randomBytes } from "crypto";
 import express, { json } from "express";
 import session from "express-session";
 import { google } from "googleapis";
+import { createClient } from "redis";
 import { config } from "./config";
 
 config();
 
 const app = express();
+
+const redisClient = createClient({
+  url: process.env.REDIS_CLIENT_URL,
+});
+
+redisClient.connect().catch(console.error);
+
+const redisStore = new RedisStore({
+  client: redisClient,
+});
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.YOUTUBE_CLIENT_ID,
@@ -29,6 +41,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     secret: "secret secret",
+    store: redisStore,
   }),
 );
 
