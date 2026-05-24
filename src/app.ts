@@ -182,10 +182,13 @@ app.get("/spotify/auth-callback", async (req, res) => {
       method: "post",
       url: "https://accounts.spotify.com/api/token",
       params: {
-        client_id: process.env.SPOTIFY_CLIENT_ID!,
         grant_type: "authorization_code",
         code: String(req.query.code),
         redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
+      },
+      auth: {
+        username: process.env.SPOTIFY_CLIENT_ID!,
+        password: process.env.SPOTIFY_CLIENT_SECRET!,
       },
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
