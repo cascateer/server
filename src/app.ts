@@ -133,30 +133,6 @@ app.get("/rubiks/customMoves", (req, res, next) =>
   ]),
 );
 
-app.get("/youtube/auth", (req, res) =>
-  res.send(
-    oauth2Client.generateAuthUrl({
-      access_type: "offline",
-      scope: ["https://www.googleapis.com/auth/youtube.force-ssl"],
-      include_granted_scopes: true,
-      state: (req.session.state = generateRandomString()),
-    }),
-  ),
-);
-
-app.get("/youtube/auth-callback", async (req, res) =>
-  req.query.state === req.session.state
-    ? oauth2Client.getToken(`${req.query.code}`).then(({ tokens }) => {
-        oauth2Client.setCredentials(tokens);
-        res.send(tokens);
-      })
-    : res.sendStatus(401),
-);
-
-app.get("/youtube/test", async (req, res) =>
-  res.send(oauth2Client.credentials),
-);
-
 app.get("/spotify/auth", (req, res) =>
   res.send(
     `https://accounts.spotify.com/authorize?${new URLSearchParams({
@@ -189,5 +165,31 @@ app.get("/spotify/auth-callback", async (req, res) =>
     }).then(({ data }) => data),
   ),
 );
+
+app.get("/youtube/auth", (req, res) =>
+  res.send(
+    oauth2Client.generateAuthUrl({
+      access_type: "offline",
+      scope: ["https://www.googleapis.com/auth/youtube.force-ssl"],
+      include_granted_scopes: true,
+      state: (req.session.state = generateRandomString()),
+    }),
+  ),
+);
+
+app.get("/youtube/auth-callback", async (req, res) =>
+  req.query.state === req.session.state
+    ? oauth2Client.getToken(`${req.query.code}`).then(({ tokens }) => {
+        oauth2Client.setCredentials(tokens);
+        res.send(tokens);
+      })
+    : res.sendStatus(401),
+);
+
+app.get("/youtube/test", async (req, res) =>
+  res.send(oauth2Client.credentials),
+);
+
+app.get("/xyz/foo", async (req, res) => res.send(await redisClient.get("foo")));
 
 export default app;
