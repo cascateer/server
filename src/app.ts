@@ -169,15 +169,8 @@ app.get("/spotify/auth", (req, res) =>
   ),
 );
 
-app.get("/spotify/auth-callback", async (req, res) => {
-  const formData = new FormData();
-
-  formData.append("client_id", process.env.SPOTIFY_CLIENT_ID!);
-  formData.append("grant_type", "authorization_code");
-  formData.append("code", String(req.query.code));
-  formData.append("redirect_uri", process.env.SPOTIFY_REDIRECT_URI!);
-
-  return res.json(
+app.get("/spotify/auth-callback", async (req, res) =>
+  res.json(
     await axios({
       method: "post",
       url: "https://accounts.spotify.com/api/token",
@@ -194,7 +187,7 @@ app.get("/spotify/auth-callback", async (req, res) => {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     }).then(({ data }) => data),
-  );
-});
+  ),
+);
 
 export default app;
