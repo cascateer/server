@@ -5,7 +5,7 @@ import { config } from "./config";
 
 config();
 
-const nodeEnv = process.env.NODE_ENV;
+const nodeEnv = process.env.NODE_ENV?.trim();
 const port = +process.env.PORT!;
 const host = process.env.HOST!;
 const callback =
