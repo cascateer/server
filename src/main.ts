@@ -5,17 +5,24 @@ import { config } from "./config";
 
 config();
 
-(process.env.NODE_ENV === "development"
-  ? createServer(
-      {
-        pfx: readFileSync("./ssl.pfx"),
-        passphrase: "passphrase",
-      },
-      app,
-    )
-  : app
-).listen(+process.env.PORT!, process.env.HOST!, () =>
-  console.info(
-    `Server is running on https://${process.env.HOST}:${process.env.PORT}`,
-  ),
-);
+const nodeEnv = process.env.NODE_ENV;
+const port = +process.env.PORT!;
+const host = process.env.HOST!;
+const callback =
+  ({ secure }: { secure: boolean }) =>
+  () =>
+    console.info(
+      `Server is running on http${secure ? "s" : ""}://${host}:${port}`,
+    );
+
+if (nodeEnv === "development") {
+  createServer(
+    {
+      pfx: readFileSync("./ssl.pfx"),
+      passphrase: "passphrase",
+    },
+    app,
+  ).listen(port, host, callback({ secure: true }));
+} else {
+  app.listen(port, host, callback({ secure: false }));
+}
