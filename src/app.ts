@@ -13,7 +13,7 @@ config();
 const app = express();
 
 const redisClient = createClient({
-  url: process.env.REDIS_CLIENT_URL,
+  url: process.env.REDIS_URL,
 });
 
 redisClient.connect().catch(console.error);
