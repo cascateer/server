@@ -4,7 +4,7 @@ import cors from "cors";
 import { randomBytes } from "crypto";
 import express, { json } from "express";
 import session from "express-session";
-import { google } from "googleapis";
+import { google, youtube_v3 } from "googleapis";
 import { createClient } from "redis";
 import { config } from "./config";
 
@@ -186,10 +186,33 @@ app.get("/youtube/auth-callback", async (req, res) =>
     : res.sendStatus(401),
 );
 
-app.get("/youtube/test", async (req, res) =>
-  res.send(oauth2Client.credentials),
-);
+app.get("/youtube/query", (req, res) => {
+  const search = (
+    query: { q?: string; channelId?: string },
+    pageToken?: string,
+  ): Promise<youtube_v3.Schema$SearchResult[]> =>
+    google
+      .youtube("v3")
+      .search.list({
+        auth: oauth2Client,
+        q: query.q,
+        channelId: query.channelId,
+        type: ["video"],
+        part: ["snippet"],
+        fields: "items(id,snippet),nextPageToken",
+        pageToken,
+        maxResults: 50,
+      })
+      .then(async ({ data: { items, nextPageToken } }) =>
+        (items ?? []).concat(
+          nextPageToken != null ? await search(query, nextPageToken) : [],
+        ),
+      );
 
-app.get("/xyz/foo", async (req, res) => res.send(await redisClient.get("foo")));
+  return search({
+    q: req.query["q"]?.toString(),
+    channelId: req.query["channelId"]?.toString(),
+  }).then((data) => res.send(data));
+});
 
 export default app;
