@@ -1,19 +1,16 @@
-import axios from "axios";
+import { envConfig } from "@cascateer/lib";
 import { RedisStore } from "connect-redis";
 import cors from "cors";
-import { randomBytes } from "crypto";
 import express, { json } from "express";
 import session from "express-session";
-import { google, youtube_v3 } from "googleapis";
 import { createClient } from "redis";
-import { config } from "./config";
 
-config();
+const { REDIS_URL } = envConfig();
 
 const app = express();
 
 const redisClient = createClient({
-  url: process.env.REDIS_URL,
+  url: REDIS_URL,
 });
 
 redisClient.connect().catch(console.error);
@@ -21,14 +18,6 @@ redisClient.connect().catch(console.error);
 const redisStore = new RedisStore({
   client: redisClient,
 });
-
-const oauth2Client = new google.auth.OAuth2(
-  process.env.YOUTUBE_CLIENT_ID,
-  process.env.YOUTUBE_CLIENT_SECRET,
-  process.env.YOUTUBE_REDIRECT_URI,
-);
-
-const generateRandomString = () => randomBytes(32).toString("hex");
 
 app.use(json());
 app.use(
@@ -132,87 +121,5 @@ app.get("/rubiks/customMoves", (req, res, next) =>
     },
   ]),
 );
-
-app.get("/spotify/auth", (req, res) =>
-  res.send(
-    `https://accounts.spotify.com/authorize?${new URLSearchParams({
-      response_type: "code",
-      client_id: process.env.SPOTIFY_CLIENT_ID!,
-      scope: "user-read-private user-read-email",
-      redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
-      state: generateRandomString(),
-    })}`,
-  ),
-);
-
-app.get("/spotify/auth-callback", async (req, res) =>
-  res.json(
-    await axios({
-      method: "post",
-      url: "https://accounts.spotify.com/api/token",
-      params: {
-        grant_type: "authorization_code",
-        code: req.query.code,
-        redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
-      },
-      auth: {
-        username: process.env.SPOTIFY_CLIENT_ID!,
-        password: process.env.SPOTIFY_CLIENT_SECRET!,
-      },
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    }).then(({ data }) => data),
-  ),
-);
-
-app.get("/youtube/auth", (req, res) =>
-  res.send(
-    oauth2Client.generateAuthUrl({
-      access_type: "offline",
-      scope: ["https://www.googleapis.com/auth/youtube.force-ssl"],
-      include_granted_scopes: true,
-      state: (req.session.state = generateRandomString()),
-    }),
-  ),
-);
-
-app.get("/youtube/auth-callback", async (req, res) =>
-  req.query.state === req.session.state
-    ? oauth2Client.getToken(`${req.query.code}`).then(({ tokens }) => {
-        oauth2Client.setCredentials(tokens);
-        res.send(tokens);
-      })
-    : res.sendStatus(401),
-);
-
-app.get("/youtube/query", (req, res) => {
-  const search = (
-    query: { q?: string; channelId?: string },
-    pageToken?: string,
-  ): Promise<youtube_v3.Schema$SearchResult[]> =>
-    google
-      .youtube("v3")
-      .search.list({
-        auth: oauth2Client,
-        q: query.q,
-        channelId: query.channelId,
-        type: ["video"],
-        part: ["snippet"],
-        fields: "items(id,snippet),nextPageToken",
-        pageToken,
-        maxResults: 50,
-      })
-      .then(async ({ data: { items, nextPageToken } }) =>
-        (items ?? []).concat(
-          nextPageToken != null ? await search(query, nextPageToken) : [],
-        ),
-      );
-
-  return search({
-    q: req.query["q"]?.toString(),
-    channelId: req.query["channelId"]?.toString(),
-  }).then((data) => res.send(data));
-});
 
 export default app;
