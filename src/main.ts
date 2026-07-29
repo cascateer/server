@@ -1,9 +1,9 @@
+import { envConfig } from "@cascateer/lib";
 import { readFileSync } from "fs";
 import { createServer } from "https";
 import app from "./app";
-import { config } from "./config";
 
-config();
+envConfig();
 
 const nodeEnv = process.env.NODE_ENV?.trim();
 const port = +process.env.PORT!;
