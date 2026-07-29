@@ -4,12 +4,12 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/main.js",
+    "start": "node --es-module-specifier-resolution=node dist/main.js",
     "dev": "set NODE_ENV=development && tsx src/main.ts",
     "update": "npm cache clean --force && npx npm-check-updates -u --format time && npm i"
   },
   "dependencies": {
-    "@cascateer/lib": "^1.0.95",
+    "@cascateer/lib": "^1.0.97",
     "connect-redis": "^10.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
