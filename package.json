@@ -8,7 +8,7 @@
     "update": "npm cache clean --force && npx npm-check-updates -u --format time && npm i"
   },
   "dependencies": {
-    "@cascateer/lib": "^1.0.89",
+    "@cascateer/lib": "^1.0.91",
     "connect-redis": "^10.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
